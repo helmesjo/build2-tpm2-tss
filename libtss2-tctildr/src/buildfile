@@ -40,6 +40,19 @@ c.poptions += -DLOG_FILE_ENABLED
 if ($c.target.class == 'linux')
   c.libs += -ldl
 
+# The upstream logging macros are invoked without variadic arguments, which
+# Clang only diagnoses in pedantic mode.
+#
+if ($c.id.type == 'clang')
+  c.coptions += -Wno-variadic-macro-arguments-omitted \
+                -Wno-unknown-warning-option
+
+# dlsym()'s pointer cast triggers -Wpedantic on GCC and Clang, neither of
+# which has a dedicated flag for it. GNU-style compilers only.
+#
+if ($c.class == 'gcc')
+  tss2-tcti/obj{tctildr-dl}: c.coptions += -Wno-pedantic
+
 #obja{*}: c.poptions += -DTSS2_STATIC_BUILD
 #objs{*}: c.poptions += -DTSS2_SHARED_BUILD
 
