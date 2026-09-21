@@ -33,6 +33,12 @@ c.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
               "-I$out_pfx_inc" "-I$src_pfx_inc" \
               "-I$out_pfx_unq" "-I$src_pfx_unq"
 
+# The upstream sources pass no variadic arguments to a variadic macro, which
+# Clang only diagnoses in pedantic mode.
+#
+if ($c.id.type == 'clang')
+  c.coptions += -Wno-gnu-zero-variadic-macro-arguments
+
 #obja{*}: c.poptions += -DTSS2_STATIC_BUILD
 #objs{*}: c.poptions += -DTSS2_SHARED_BUILD
 
