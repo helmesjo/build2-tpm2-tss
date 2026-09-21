@@ -35,6 +35,26 @@ c.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
 
 c.poptions += -DLOG_FILE_ENABLED
 
+# The upstream logging macros are invoked without variadic arguments, which
+# Clang only diagnoses in pedantic mode.
+#
+# The upstream sources also end some macro invocations with a semicolon.
+#
+if ($c.id.type == 'clang')
+  c.coptions += -Wno-variadic-macro-arguments-omitted \
+                -Wno-extra-semi \
+                -Wno-unknown-warning-option
+
+# These files end macro invocations with a stray ';', which GCC has no
+# dedicated flag for.
+#
+if ($c.id.type == 'gcc')
+{
+  tss2-mu/obj{tpma-types}:  c.coptions += -Wno-pedantic
+  tss2-mu/obj{tpm2b-types}: c.coptions += -Wno-pedantic
+  tss2-mu/obj{tpms-types}:  c.coptions += -Wno-pedantic
+}
+
 #obja{*}: c.poptions += -DTSS2_STATIC_BUILD
 #objs{*}: c.poptions += -DTSS2_SHARED_BUILD
 
