@@ -40,6 +40,27 @@ c.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
 c.poptions += -DLOG_FILE_ENABLED -DOSSL -DHAVE_EVP_SM3 -DHAVE_EVP_SM4_CFB \
               "-I$src_base/tss2-esys"
 
+# The upstream logging macros are invoked without variadic arguments, which
+# Clang only diagnoses in pedantic mode.
+#
+# The upstream sources also end some macro invocations with a semicolon and
+# use an empty initializer and an old-style function definition, which are
+# only diagnosed in pedantic mode.
+#
+if ($c.id.type == 'clang')
+  c.coptions += -Wno-variadic-macro-arguments-omitted \
+                -Wno-gnu-zero-variadic-macro-arguments \
+                -Wno-extra-semi \
+                -Wno-c23-extensions \
+                -Wno-strict-prototypes \
+                -Wno-unknown-warning-option
+
+# esys_tr.c has a stray ';' after a function, which GCC has no dedicated
+# flag for.
+#
+if ($c.id.type == 'gcc')
+  tss2-esys/obj{esys_tr}: c.coptions += -Wno-pedantic
+
 #obja{*}: c.poptions += -DTSS2_STATIC_BUILD
 #objs{*}: c.poptions += -DTSS2_SHARED_BUILD
 
