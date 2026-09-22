@@ -21,5 +21,4 @@ depends: libtss2-mu == $
 depends: libtpms >= 0.10.2
 build-include: linux**
 build-include: freebsd**
-build-include: macos**
-build-exclude: ** ; Only Linux, FreeBSD, and macOS are supported.
+build-exclude: ** ; Only Linux and FreeBSD are supported (upstream uses Linux's mremap()/posix_fallocate(), with a FreeBSD stub for mremap() but no macOS equivalent).
