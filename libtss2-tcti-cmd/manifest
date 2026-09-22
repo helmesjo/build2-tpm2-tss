@@ -20,5 +20,4 @@ depends: libtss2-headers == $
 depends: libtss2-mu == $
 build-include: linux**
 build-include: freebsd**
-build-include: macos**
-build-exclude: ** ; Only Linux, FreeBSD, and macOS are supported.
+build-exclude: ** ; Only Linux and FreeBSD are supported (upstream uses Linux's prctl() and FreeBSD's procctl() to arrange for the child process to be killed if the parent dies, with no macOS equivalent).
