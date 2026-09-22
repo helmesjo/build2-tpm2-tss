@@ -1,0 +1,24 @@
+--- tcti-libtpms.c.orig	2026-09-21 18:43:38
++++ tcti-libtpms.c	2026-09-22 18:47:36
+@@ -27,6 +27,12 @@
+ #include "tss2_tcti_libtpms.h" // for Tss2_Tcti_Libtpms_Init, Tss2_Tcti_Lib...
+ #include "tss2_tpm2_types.h"   // for TPM2_RC_SUCCESS
+ #include "util/aux_util.h"     // for MAYBE_UNUSED, ARRAY_LEN
++
++#if defined(_MSC_VER)
++#define TSS2_TLS __declspec(thread)
++#else
++#define TSS2_TLS __thread
++#endif
+ 
+ #define LOGMODULE tcti
+ #include "util/log.h" // for LOG_ERROR, LOG_TRACE, LOG_DEBUG, LOGB...
+@@ -53,7 +59,7 @@
+     }                                                                                              \
+     current_tcti_libtpms = NULL;
+ 
+-static __thread TSS2_TCTI_LIBTPMS_CONTEXT *current_tcti_libtpms = NULL;
++static TSS2_TLS TSS2_TCTI_LIBTPMS_CONTEXT *current_tcti_libtpms = NULL;
+ 
+ /*
+  * If the mapped memory for the state file does not suffice, reallocate. This
