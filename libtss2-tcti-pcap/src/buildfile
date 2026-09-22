@@ -44,6 +44,14 @@ if ($c.id.type == 'clang')
   c.coptions += -Wno-variadic-macro-arguments-omitted \
                 -Wno-unknown-warning-option
 
+# tcti-pcap-builder.c advances a void* packet-building cursor with pointer
+# arithmetic, a GNU extension flagged only under -pedantic.
+#
+if ($c.id.type == 'clang')
+  c.coptions += -Wno-gnu-pointer-arith
+elif ($c.id.type == 'gcc')
+  c.coptions += -Wno-pointer-arith
+
 #obja{*}: c.poptions += -DTSS2_STATIC_BUILD
 #objs{*}: c.poptions += -DTSS2_SHARED_BUILD
 
