@@ -4,6 +4,10 @@ This is a `build2` package for the
 [`tpm2-tss`](https://github.com/tpm2-software/tpm2-tss) C library. It
 provides decoding of TSS and TPM 2.0 response codes into human-readable descriptions.
 
+Upstream's `tss2_rc.c` is patched to use a portable thread-local-storage
+macro, since MSVC does not support the GNU/Clang `__thread` extension used
+by the original source.
+
 
 ## Usage
 
