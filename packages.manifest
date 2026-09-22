@@ -27,3 +27,6 @@ location: libtss2-esys/
 
 :
 location: libtss2-tcti-libtpms/
+
+:
+location: libtss2-tcti-null/
