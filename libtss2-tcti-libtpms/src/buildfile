@@ -1,0 +1,54 @@
+intf_libs = # Interface dependencies.
+impl_libs = # Implementation dependencies.
+#import xxxx_libs += libhello%lib{hello}
+
+# Public headers.
+#
+pub = [dir_path] ../include/tss2/
+
+include $pub
+
+pub_hdrs = $($pub/ pub_hdrs)
+
+lib{tss2-tcti-libtpms}: $pub/{$pub_hdrs}
+
+# Private headers and sources as well as dependencies.
+#
+lib{tss2-tcti-libtpms}: {h c}{**} $impl_libs $intf_libs
+
+# Build options.
+#
+out_pfx_inc = [dir_path] $out_root/include/
+src_pfx_inc = [dir_path] $src_root/include/
+out_pfx_src = [dir_path] $out_root/src/
+src_pfx_src = [dir_path] $src_root/src/
+
+c.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" \
+              "-I$out_pfx_inc" "-I$src_pfx_inc"
+
+#obja{*}: c.poptions += -DTSS2_STATIC_BUILD
+#objs{*}: c.poptions += -DTSS2_SHARED_BUILD
+
+# Export options.
+#
+lib{tss2-tcti-libtpms}:
+{
+  c.export.poptions = "-I$out_pfx_inc" "-I$src_pfx_inc"
+  c.export.libs = $intf_libs
+}
+
+#liba{tss2-tcti-libtpms}: c.export.poptions += -DTSS2_STATIC
+#libs{tss2-tcti-libtpms}: c.export.poptions += -DTSS2_SHARED
+
+# For pre-releases use the complete version to make sure they cannot
+# be used in place of another pre-release or the final version. See
+# the version module for details on the version.* variable values.
+#
+if $version.pre_release
+  lib{tss2-tcti-libtpms}: bin.lib.version = "-$version.project_id"
+else
+  lib{tss2-tcti-libtpms}: bin.lib.version = "-$version.major.$version.minor"
+
+# Don't install private headers.
+#
+h{*}: install = false
