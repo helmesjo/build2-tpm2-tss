@@ -6,6 +6,12 @@ provides the TPM command transmission interface (TCTI) module that talks to
 a TPM simulator or proxy by piping commands and responses through the
 standard input and output of a launched sub-process.
 
+Upstream's `tcti-cmd.c` is patched to compile on macOS, which has no
+`prctl()`/`procctl()` equivalent for requesting a parent-death signal. On
+macOS the launched sub-process is not automatically terminated if the
+parent process dies unexpectedly; normal shutdown still closes it as
+usual.
+
 
 ## Usage
 
