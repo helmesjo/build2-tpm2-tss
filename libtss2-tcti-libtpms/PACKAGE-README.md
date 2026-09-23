@@ -36,9 +36,11 @@ The library is declared in `<tss2/tss2_tcti_libtpms.h>`. The TCTI loader
 
 Upstream's `tcti-libtpms.c` is patched to use a portable thread-local-storage
 macro, since MSVC does not support the GNU/Clang `__thread` extension used
-by the original source. Only Linux and FreeBSD are supported: upstream
-relies on Linux's `mremap()`/`posix_fallocate()`, with a FreeBSD stub for
-`mremap()` but no macOS equivalent.
+by the original source. It is also patched for FreeBSD and macOS, neither
+of which has Linux's `mremap()` (and macOS also lacks `posix_fallocate()`):
+on those two platforms, state-file persistence (a non-empty `conf` string)
+is rejected at initialization; using this TCTI without a state file is
+unaffected.
 
 
 ## Configuration variables

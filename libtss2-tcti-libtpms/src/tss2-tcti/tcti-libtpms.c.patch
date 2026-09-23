@@ -1,19 +1,27 @@
 --- tcti-libtpms.c.orig	2026-09-21 18:43:38
-+++ tcti-libtpms.c	2026-09-22 18:47:36
-@@ -27,6 +27,12 @@
- #include "tss2_tcti_libtpms.h" // for Tss2_Tcti_Libtpms_Init, Tss2_Tcti_Lib...
++++ tcti-libtpms.c	2026-09-23 11:35:05
+@@ -28,11 +28,20 @@
  #include "tss2_tpm2_types.h"   // for TPM2_RC_SUCCESS
  #include "util/aux_util.h"     // for MAYBE_UNUSED, ARRAY_LEN
-+
+ 
 +#if defined(_MSC_VER)
 +#define TSS2_TLS __declspec(thread)
 +#else
 +#define TSS2_TLS __thread
 +#endif
- 
++
  #define LOGMODULE tcti
  #include "util/log.h" // for LOG_ERROR, LOG_TRACE, LOG_DEBUG, LOGB...
-@@ -53,7 +59,7 @@
+ 
+ #if defined(__FreeBSD__)
+ #define mremap(a, b, c, d) ((void *)(-1))
++#elif defined(__APPLE__)
++#define mremap(a, b, c, d) ((void *)(-1))
++#define posix_fallocate(fd, offset, len) (ENOSYS)
+ #endif
+ 
+ /*
+@@ -53,7 +62,7 @@
      }                                                                                              \
      current_tcti_libtpms = NULL;
  
@@ -22,3 +30,17 @@
  
  /*
   * If the mapped memory for the state file does not suffice, reallocate. This
+@@ -889,10 +898,10 @@
+     if (conf == NULL || strlen(conf) == 0) {
+         tcti_libtpms->state_path = NULL;
+     } else {
+-#ifdef __FreeBSD__
+-        // mremap() on FreeBSD is a stub returning -1/ENOMEM
++#if defined(__FreeBSD__) || defined(__APPLE__)
++        // mremap()/posix_fallocate() are stubbed out on FreeBSD/macOS
+         // this could be fixed with a munmap()/mmap() workaround
+-        LOG_ERROR("Libtpms state files are not supported on FreeBSD. Try an empty conf string.");
++        LOG_ERROR("Libtpms state files are not supported on FreeBSD or macOS. Try an empty conf string.");
+         return TSS2_TCTI_RC_BAD_VALUE;
+ #else
+         tcti_libtpms->state_path = strdup(conf);

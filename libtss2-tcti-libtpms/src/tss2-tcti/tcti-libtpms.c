@@ -39,6 +39,9 @@
 
 #if defined(__FreeBSD__)
 #define mremap(a, b, c, d) ((void *)(-1))
+#elif defined(__APPLE__)
+#define mremap(a, b, c, d) ((void *)(-1))
+#define posix_fallocate(fd, offset, len) (ENOSYS)
 #endif
 
 /*
@@ -895,10 +898,10 @@ Tss2_Tcti_Libtpms_Init(TSS2_TCTI_CONTEXT *tctiContext, size_t *size, const char 
     if (conf == NULL || strlen(conf) == 0) {
         tcti_libtpms->state_path = NULL;
     } else {
-#ifdef __FreeBSD__
-        // mremap() on FreeBSD is a stub returning -1/ENOMEM
+#if defined(__FreeBSD__) || defined(__APPLE__)
+        // mremap()/posix_fallocate() are stubbed out on FreeBSD/macOS
         // this could be fixed with a munmap()/mmap() workaround
-        LOG_ERROR("Libtpms state files are not supported on FreeBSD. Try an empty conf string.");
+        LOG_ERROR("Libtpms state files are not supported on FreeBSD or macOS. Try an empty conf string.");
         return TSS2_TCTI_RC_BAD_VALUE;
 #else
         tcti_libtpms->state_path = strdup(conf);
