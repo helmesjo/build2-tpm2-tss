@@ -42,6 +42,12 @@ c.poptions += -DLOG_FILE_ENABLED
 if ($c.target.class == 'linux')
   c.libs += -ldl
 
+# mremap()/MREMAP_MAYMOVE are glibc GNU extensions gated behind
+# _GNU_SOURCE, which GCC's default -std=gnu17 dialect does not imply.
+#
+if ($c.target.class == 'linux')
+  tss2-tcti/obj{tcti-libtpms}: c.poptions += -D_GNU_SOURCE
+
 # The upstream logging macros are invoked without variadic arguments, which
 # Clang only diagnoses in pedantic mode.
 #
